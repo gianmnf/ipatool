@@ -14,16 +14,27 @@ jobs:
       fail-fast: false
       matrix:
         arch: [arm64, amd64]
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-go@v5
         with:
           go-version: "1.25.0"
           cache: true
-      - run: go build -o ipatool-$GOOS-$GOARCH.exe
+
+      - name: Build
+        run: go build -o ipatool-windows-$GOARCH.exe
         env:
           GOOS: windows
           GOARCH: ${{ matrix.arch }}
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ipatool-windows-${{ matrix.arch }}
+          path: ipatool-windows-${{ matrix.arch }}.exe
+
   build_linux:
     name: Build for Linux
     runs-on: ${{ matrix.runner }}
@@ -35,15 +46,26 @@ jobs:
             runner: ubuntu-24.04-arm
           - arch: amd64
             runner: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-go@v5
         with:
           go-version: "1.25.0"
           cache: true
-      - run: go build -o ipatool-linux-$GOARCH
+
+      - name: Build
+        run: go build -o ipatool-linux-$GOARCH
         env:
           GOARCH: ${{ matrix.arch }}
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ipatool-linux-${{ matrix.arch }}
+          path: ipatool-linux-${{ matrix.arch }}
+
   build_macos:
     name: Build for macOS
     runs-on: macos-latest
@@ -51,16 +73,26 @@ jobs:
       fail-fast: false
       matrix:
         arch: [arm64, amd64]
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-go@v5
         with:
           go-version: "1.25.0"
           cache: true
-      - run: go build -o ipatool-$GOOS-$GOARCH
+
+      - name: Build
+        run: go build -o ipatool-darwin-$GOARCH
         env:
           GOOS: darwin
           GOARCH: ${{ matrix.arch }}
           CGO_ENABLED: 1
           CGO_CFLAGS: -mmacosx-version-min=10.15
           CGO_LDFLAGS: -mmacosx-version-min=10.15
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ipatool-macos-${{ matrix.arch }}
+          path: ipatool-darwin-${{ matrix.arch }}
